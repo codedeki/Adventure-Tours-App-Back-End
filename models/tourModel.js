@@ -55,6 +55,10 @@ const tourSchema = new mongoose.Schema(
       select: false, //optional: to hide this object from the field limiter!
     },
     startDates: [Date], //an array of dates
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -82,6 +86,28 @@ tourSchema.pre('save', function (next) {
 //   console.log(doc);
 //   next();
 // });
+
+// 2) Query middleware: this points to current query whereas in document middleware this points to document
+//with regex will run for all middleware fns() starting w/ find keyword
+tourSchema.pre(/^find/, function (next) {
+  this.find({ secretTour: { $ne: true } });
+
+  this.start = Date.now();
+  next();
+});
+
+tourSchema.post(/^find/, function (docs, next) {
+  console.log(`Query took ${Date.now() - this.start} milliseconds!`);
+  // console.log(docs);
+  next();
+});
+
+// 3) Aggregation middleware
+tourSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+  console.log(this.pipeline());
+  next();
+});
 
 const Tour = mongoose.model('Tour', tourSchema);
 
