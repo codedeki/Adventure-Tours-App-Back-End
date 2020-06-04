@@ -13,7 +13,7 @@ router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
 // router.param('id', tourController.checkID ); //set up middleware filter for our tour functions below w/ param
 router
   .route('/')
-  .get(tourController.getAllTours)
+  .get(/*(CatchAsync*/ tourController.getAllTours)
   .post(tourController.createTour);
 router
   .route('/:id')
