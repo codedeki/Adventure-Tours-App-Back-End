@@ -16,8 +16,8 @@ app.use(express.json()); //middleware to modify incoming request data
 app.use(express.static(`${__dirname}/public`)); //middleware to serve static files
 
 app.use((req, res, next) => {
-  console.log('Middleware 2 activated');
   req.requestTIme = new Date().toISOString();
+  // console.log(req.headers);
   next();
 });
 

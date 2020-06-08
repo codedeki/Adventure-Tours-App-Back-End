@@ -39,6 +39,9 @@ const userSchema = new mongoose.Schema({
       message: 'Passwords are not the same',
     },
   },
+  passwordChangedAt: {
+    type: Date,
+  },
 });
 
 //Encryption BCRYPT
@@ -58,6 +61,23 @@ userSchema.methods.correctPassword = async function (
   userPassword
 ) {
   return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+//Check if password changed after token issued
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
+    console.log(
+      `Password Change Function Call Time Stamp: ${changedTimestamp} vs JWT Time Stamp At Login: ${JWTTimestamp}`
+    );
+    return JWTTimestamp < changedTimestamp;
+    /* As soon as a user changes password, the code in this function executes to make a date stamp of that change by calling getTime(); we then compare that getTime() date stamp with the date stamp of the existing token that was issued at login; if the date stamp of the changed password function using getTime() is newer than or more recent: i.e. *greater than*, that means the password was changed and therefore the token date stamp is older than or outdated: i.e. *less than*, so we return false in the next line and deny access to user profile */
+  }
+
+  return false;
 };
 
 const User = mongoose.model('User', userSchema);
