@@ -12,6 +12,7 @@ const signToken = (id) => {
 
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
+    role: req.body.role,
     name: req.body.name,
     email: req.body.email,
     password: req.body.password,
@@ -86,7 +87,34 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
 
-  // Else Grant access to protected route
+  // Else Grant (and store in variable) access to protected route: need this line for restrictTo to work in req.user.role
   req.user = currentUser;
   next();
 });
+
+//Authorization Middleware: User Roles & Permissions
+exports.restrictTo = (...roles) => {
+  //middleware has access to ...roles b/c of closures
+  return (req, res, next) => {
+    //if role is not specified in args when calling restrictTo(), then error (cf. tourRoutes.js)
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError('You do not have permission to perform this action', 403)
+      );
+    }
+    next();
+  };
+};
+
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email });
+  // 1) check if user exists
+  if (!user) {
+    return next(new AppError('There is no user with that e-mail address', 404));
+  }
+  // 2) get random reset token
+  const resetToken = user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false });
+});
+
+exports.resetPassword = (req, res, next) => {};
