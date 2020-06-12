@@ -61,6 +61,14 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+//Password Reset Middleware: Runs before new doc is saved
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000; //put psw change at 1 second in past to give time for token to be created
+  next();
+});
+
 //Compare user typed password to databse password
 userSchema.methods.correctPassword = async function (
   candidatePassword,
