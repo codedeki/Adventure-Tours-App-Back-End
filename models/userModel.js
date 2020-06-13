@@ -48,6 +48,11 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
 });
 
 //Encryption BCRYPT
@@ -66,6 +71,13 @@ userSchema.pre('save', function (next) {
   if (!this.isModified('password') || this.isNew) return next();
 
   this.passwordChangedAt = Date.now() - 1000; //put psw change at 1 second in past to give time for token to be created
+  next();
+});
+
+//Hide User when Deleted Middleware
+userSchema.pre(/^find/, function (next) {
+  //points to current query
+  this.find({ active: { $ne: false } });
   next();
 });
 
