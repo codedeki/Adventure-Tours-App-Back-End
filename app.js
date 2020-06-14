@@ -2,6 +2,9 @@ const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const hpp = require('hpp');
 
 const globalErrorHandler = require('./controllers/errorController');
 const AppError = require('./utils/appError');
@@ -30,6 +33,31 @@ app.use('/api', limiter); // only affect routes starting in /api
 
 // Body parser, reading data from body in req.body
 app.use(express.json({ limit: '10kb' })); //middleware to modify incoming request data, e.g. don't accept data larger than limit
+
+// Data Sanitization against NoSQL query injection
+// e.g. POST login with this in body, which returns true:
+// {
+//   "email": { "$gt": "" },
+//   "password": "password"
+// }
+app.use(mongoSanitize());
+
+// Data Sanitization against XSS
+app.use(xss());
+
+// Prevent parameter pollution (remove duplicate query strings) / except: can white-list some params if desire
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'ratingsQuantity',
+      'ratingsAverage',
+      'maxGroupSize',
+      'difficulty',
+      'price',
+    ],
+  })
+);
 
 // Serving static files
 app.use(express.static(`${__dirname}/public`)); //middleware to serve static files
