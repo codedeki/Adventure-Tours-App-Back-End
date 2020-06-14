@@ -1,5 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 const globalErrorHandler = require('./controllers/errorController');
 const AppError = require('./utils/appError');
@@ -8,13 +10,31 @@ const userRouter = require('./routes/userRoutes');
 
 const app = express();
 
-// 1) Middlewares
+// 1) Global Middlewares
+// Set security http headers with helmet
+app.use(helmet());
+
+// Development
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
-app.use(express.json()); //middleware to modify incoming request data
+
+// Rate Limiting Middleware: define how many requests allowed per user IP address
+const limiter = rateLimit({
+  max: 100, // per hour
+  windowMs: 60 * 60 * 1000,
+  message:
+    'Too many requests from your internet address, please try again in an hour!',
+});
+app.use('/api', limiter); // only affect routes starting in /api
+
+// Body parser, reading data from body in req.body
+app.use(express.json({ limit: '10kb' })); //middleware to modify incoming request data, e.g. don't accept data larger than limit
+
+// Serving static files
 app.use(express.static(`${__dirname}/public`)); //middleware to serve static files
 
+// Test midleware
 app.use((req, res, next) => {
   req.requestTIme = new Date().toISOString();
   // console.log(req.headers);
