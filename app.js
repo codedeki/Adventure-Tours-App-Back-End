@@ -46,6 +46,7 @@ app.use(mongoSanitize());
 app.use(xss());
 
 // Prevent parameter pollution (remove duplicate query strings) / except: can white-list some params if desire
+// e.g. ...api/v1/tours?duration=5&duration=9 is now allowed b/c duration is in whitelist
 app.use(
   hpp({
     whitelist: [
