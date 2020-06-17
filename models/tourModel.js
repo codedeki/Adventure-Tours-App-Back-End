@@ -157,6 +157,15 @@ tourSchema.post(/^find/, function (docs, next) {
   next();
 });
 
+//OR Middleware: using populate for all data
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  });
+  next();
+});
+
 // 3) Aggregation middleware
 tourSchema.pre('aggregate', function (next) {
   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });

@@ -35,6 +35,10 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
 
 exports.getTour = catchAsync(async (req, res, next) => {
   const tour = await Tour.findById(req.params.id);
+  // .populate({
+  //   path: 'guides', //show this
+  //   select: '-__v -passwordChangedAt', // hide this; use Mongoose populate to show/hide certain data
+  // });
   // Tour.findOne({ _id: req.params.id })
 
   if (!tour) {
