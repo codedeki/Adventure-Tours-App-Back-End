@@ -1,8 +1,23 @@
 const express = require('express');
 const tourController = require('../controllers/tourController');
 const authController = require('../controllers/authController');
+// const reviewController = require('../controllers/reviewController');
+const reviewRouter = require('./reviewRoutes');
 
 const router = express.Router();
+
+// Review Route without Merge Params: Nested Routes to associate tours with reviews and vice versa,
+//eg. /tour/23349f/reviews
+// router
+//   .route('/:tourId/reviews')
+//   .post(
+//     authController.protect,
+//     authController.restrictTo('user'),
+//     reviewController.createReview
+//   );
+
+//Review Route with Merge Params: Nested Routes Avoid Duplicate Code
+router.use('/:tourId/reviews', reviewRouter);
 
 router
   .route('/top-5-cheap')

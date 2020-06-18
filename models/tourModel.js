@@ -107,6 +107,13 @@ const tourSchema = new mongoose.Schema(
       },
     ],
     guides: [{ type: mongoose.Schema.ObjectId, ref: 'User' }], // pass by reference; if embed use guides: type: Array
+    // if child reference reviews: or use virtual populate in tourModel
+    // reviews: [
+    //   {
+    //     type: mongoose.Schema.ObjectId,
+    //     ref: 'Review',
+    //   },
+    // ],
   },
   {
     toJSON: { virtuals: true },
@@ -117,6 +124,13 @@ const tourSchema = new mongoose.Schema(
 // Business logic: not part of database but runs for every get request to tourSchema
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7; //use function keyword to get own this keyword to refer to current object (not =>)
+});
+
+// Virtual Populate - keep ref of child docs on parent doc w/out persisting that info to db - good for performance
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour', // from reviewModel.js
+  localField: '_id',
 });
 
 // 1) Document middleware: runs before .save() and .create() but not on .insertMany(), etc.
