@@ -121,6 +121,10 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+//Improving read performance by creating INDEXES 1 asc, -1 desc
+tourSchema.index({ price: 1, ratingsAverage: -1 });
+tourSchema.index({ slug: 1 });
+
 // Business logic: not part of database but runs for every get request to tourSchema
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7; //use function keyword to get own this keyword to refer to current object (not =>)
