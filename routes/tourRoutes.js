@@ -32,6 +32,15 @@ router
     tourController.getMonthlyPlan
   );
 
+//Geospatial Queries within user radius
+// /tours-within?distance=233&center=40,45&unit=mi
+// /tours-within/233/center/40,45&unit/mi
+router
+  .route('/tours-within/:distance/center/:latlng/unit/:unit')
+  .get(tourController.getToursWithin);
+
+router.route('/distances/:latlng/unit/:unit').get(tourController.getDistances);
+
 // router.param('id', tourController.checkID ); //set up middleware filter for our tour functions below w/ param
 router
   .route('/')

@@ -125,6 +125,8 @@ const tourSchema = new mongoose.Schema(
 //Improving read performance by creating INDEXES 1 asc, -1 desc
 tourSchema.index({ price: 1, ratingsAverage: -1 });
 tourSchema.index({ slug: 1 });
+//Geospatial Data must be 2d sphere or 2d index
+tourSchema.index({ startLocation: '2dsphere' });
 
 // Business logic: not part of database but runs for every get request to tourSchema
 tourSchema.virtual('durationWeeks').get(function () {
@@ -186,11 +188,11 @@ tourSchema.pre(/^find/, function (next) {
 });
 
 // 3) Aggregation middleware
-tourSchema.pre('aggregate', function (next) {
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
-  console.log(this.pipeline());
-  next();
-});
+// tourSchema.pre('aggregate', function (next) {
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+//   console.log(this.pipeline());
+//   next();
+// });
 
 const Tour = mongoose.model('Tour', tourSchema);
 
