@@ -16,6 +16,8 @@ const viewRouter = require('./routes/viewRoutes');
 
 const app = express();
 
+console.log(process.env);
+
 //Define view engine
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views')); // correct path
