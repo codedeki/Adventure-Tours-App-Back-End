@@ -76,6 +76,9 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } // also allow cookies to pass for authentication
+  else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
   //1) Check if token exists
   if (!token) {
@@ -104,6 +107,30 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // Else Grant (and store in variable) access to protected route: need this line for restrictTo to work in req.user.role
   req.user = currentUser;
+  next();
+});
+
+//Only for rendered pages, no errors
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+  if (req.cookies.jwt) {
+    // 1) verifies token
+    const decoded = await promisify(jwt.verify)(
+      req.cookies.jwt,
+      process.env.JWT_SECRET
+    );
+    // 2) Check if user exists
+    const currentUser = await User.findById(decoded.id);
+    if (!currentUser) {
+      return next();
+    }
+    // 3) Check if user changed psw after token was issued
+    if (currentUser.changedPasswordAfter(decoded.iat)) {
+      return next();
+    }
+    // 4) There is a logged in user
+    res.locals.user = currentUser;
+    return next();
+  }
   next();
 });
 

@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cookieParser = require('cookie-parser');
 
 const globalErrorHandler = require('./controllers/errorController');
 const AppError = require('./utils/appError');
@@ -15,8 +16,6 @@ const reviewRouter = require('./routes/reviewRoutes');
 const viewRouter = require('./routes/viewRoutes');
 
 const app = express();
-
-console.log(process.env);
 
 //Define view engine
 app.set('view engine', 'pug');
@@ -45,6 +44,7 @@ app.use('/api', limiter); // only affect routes starting in /api
 
 // Body parser, reading data from body in req.body
 app.use(express.json({ limit: '10kb' })); //middleware to modify incoming request data, e.g. don't accept data larger than limit
+app.use(cookieParser());
 
 // Data Sanitization against NoSQL query injection
 // e.g. POST login with this in body, which returns true:
@@ -76,6 +76,7 @@ app.use(
 app.use((req, res, next) => {
   req.requestTIme = new Date().toISOString();
   // console.log(req.headers);
+  console.log(req.cookies);
   next();
 });
 
