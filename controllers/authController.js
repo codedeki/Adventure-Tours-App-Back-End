@@ -85,7 +85,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   ) {
     token = req.headers.authorization.split(' ')[1];
   } // also allow cookies to pass for authentication
-  else if (req.cookies.jwt) {
+  else if (req.cookies.jwt && req.cookies.jwt !== 'loggedout') {
     token = req.cookies.jwt;
   }
   //1) Check if token exists
@@ -115,6 +115,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // Else Grant (and store in variable) access to protected route: need this line for restrictTo to work in req.user.role
   req.user = currentUser;
+  res.locals.user = currentUser; // add so we can use in all templates (account template)
   next();
 });
 
