@@ -44,6 +44,7 @@ app.use('/api', limiter); // only affect routes starting in /api
 
 // Body parser, reading data from body in req.body
 app.use(express.json({ limit: '10kb' })); //middleware to modify incoming request data, e.g. don't accept data larger than limit
+app.use(express.urlencoded({ extended: true, limit: '10kb' })); // added to update HTML form
 app.use(cookieParser());
 
 // Data Sanitization against NoSQL query injection
