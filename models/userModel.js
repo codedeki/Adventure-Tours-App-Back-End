@@ -97,9 +97,9 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
       this.passwordChangedAt.getTime() / 1000,
       10
     );
-    console.log(
-      `Password Change Function Call Time Stamp: ${changedTimestamp} vs JWT Time Stamp At Login: ${JWTTimestamp}`
-    );
+    // console.log(
+    //   `Password Change Function Call Time Stamp: ${changedTimestamp} vs JWT Time Stamp At Login: ${JWTTimestamp}`
+    // );
     return JWTTimestamp < changedTimestamp;
     /* As soon as a user changes password, the code in this function executes to make a date stamp of that change by calling getTime(); we then compare that getTime() date stamp with the date stamp of the existing token that was issued at login; if the date stamp of the changed password function using getTime() is newer than or more recent: i.e. *greater than*, that means the password was changed and therefore the token date stamp is older than or outdated: i.e. *less than*, so we return false in the next line and deny access to user profile */
   }
@@ -115,7 +115,7 @@ userSchema.methods.createPasswordResetToken = function () {
     .update(resetToken)
     .digest('hex');
 
-  console.log({ resetToken }, this.passwordResetToken);
+  // console.log({ resetToken }, this.passwordResetToken);
 
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
 
