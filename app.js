@@ -75,7 +75,7 @@ app.use(
   })
 );
 
-app.use(compression); // compress text for deployment
+app.use(compression()); // compress text for deployment
 
 // Test midleware
 app.use((req, res, next) => {
