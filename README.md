@@ -1,5 +1,6 @@
 ## Full Stack Web Development using modern techonologies including:
 * Node JS
+* Express 
 * MongoDB 
 * Mongoose 
 * PUG Templates
